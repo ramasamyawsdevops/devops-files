@@ -1,0 +1,67 @@
+pipeline {
+    agent any
+    
+    tools {
+        maven 'MAVEN_HOME'
+    }
+
+    stages {
+        stage('GitCheckout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/ranjithawsdevops/Devops-sonar.git'
+            }
+        }
+         stage('Compile') {
+            steps {
+                dir ("./addressbook/addressbook_main"){
+                sh 'mvn compile'
+                }
+            }
+        }
+        stage('Build') {
+            steps {
+                dir ("./addressbook/addressbook_main"){
+                sh 'mvn package'
+                }
+            }
+        }
+        
+        stage('CodeAnalysis') {
+            steps {
+                dir ("./addressbook/addressbook_main"){
+                withSonarQubeEnv(credentialsId: 'sonar-token', installationName:'sonar') {
+                    sh "mvn clean verify sonar:sonar -Dsonar.projectKey=test-project -Dsonar.projectName='test-project'"
+                  }
+                }
+            }
+        }
+        
+        
+        stage('PublishArtifactNexus') {
+            steps {
+                dir ("./addressbook/addressbook_main/target"){
+                nexusArtifactUploader artifacts: [[artifactId: 'testartifactid', classifier: '', file: 'addressbook.war', type: 'war']], credentialsId: 'nexus-connection', groupId: 'com.text.app', nexusUrl: '192.168.56.102:8086', nexusVersion: 'nexus3', protocol: 'http', repository: 'testrepository', version: '2.1.1-SNAPSHOT'
+                }
+            }
+        }
+        
+        stage('Install Apache Tomcat Server') {
+            steps {
+                sh 'sudo wget https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.24/bin/apache-tomcat-8.5.24.tar.gz'
+                sh 'sudo tar -xzvf apache-tomcat-8.5.24.tar.gz'
+                sh 'sudo chown -R cloudadmin:cloudadmin apache-tomcat-8.5.24'
+                sh 'sudo cp tomcat-users.xml apache-tomcat-8.5.24/conf/tomcat-users.xml'
+                sh 'sudo cp context.xml apache-tomcat-8.5.24/webapps/manager/META-INF/context.xml'
+                sh 'sudo sed -i "s/8080/8082/g" apache-tomcat-8.5.24/conf/server.xml'
+        }
+}        
+     stage('Deploy Sample Application To Tomcat Server') {
+            steps {
+                sh 'sudo cp addressbook/addressbook_main/target/addressbook.war apache-tomcat-8.5.24/webapps/'
+                sh 'sudo runuser -l cloudadmin -c "/var/lib/jenkins/workspace/sonar-nexus/apache-tomcat-8.5.24/bin/startup.sh"'
+            }
+        }
+        
+    }
+    
+}
