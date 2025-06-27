@@ -1,0 +1,34 @@
+pipeline {
+    agent any
+    tools {
+      maven 'MAVEN_HOME'
+    }
+    stages {
+        stage('gitClone') {
+      steps {
+        git branch: 'main', url: 'https://github.com/Ramasamy3488/worldjava.git'
+      }
+        }
+
+        stage('Maven build') {
+      steps {
+        dir('samplejar') {
+          sh 'mvn package'
+        }
+      }
+        }
+    stage('Build Image and push')
+          {
+      steps {
+            script {
+              docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
+              /* Build Docker Image locally */
+              myImage = docker.build('ramasamy123/myramjava:v1')
+              /* Push the container to the Registry */
+              myImage.push()
+              }
+            }
+        }
+      }
+    }
+}

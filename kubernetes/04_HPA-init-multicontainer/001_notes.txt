@@ -1,0 +1,38 @@
+         steps:
+
+              #  aws eks --region ap-south-1 update-kubeconfig --name devcluster
+
+              #  kubectl.exe apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+              #  kubectl.exe get pod -n kube-system
+
+              #  kubectl create -f ns.yaml
+
+                kubectl create -f newIngressctrl.yaml
+
+                kubectl create -f deployment-hpa.yaml
+
+         check the hpa:
+
+                kubectl get hpa -n devproject
+
+
+         To check CPU and memory utilization :
+
+                1.  we need metrics server
+                2.  then
+
+                 kubectl top node
+                 kubectl top pod webapp -n devproject
+
+
+         test:
+
+                install a amazon linux 2
+
+                amazon-linux-extras install epel
+
+                yum install siege -y
+
+                siege -t3 -c200 -v http://www.suryateck.com
+
