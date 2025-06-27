@@ -1,0 +1,203 @@
+Absolutely! Here's a complete list of **application types**, **deployment steps**, and their **prerequisites** — everything you need **before** and **during** deployment on a server.
+
+---
+
+##  1. Static Website (HTML/CSS/JS)
+
+###  Prerequisites:
+
+* HTML/CSS/JS files
+* Server with Ubuntu (or similar)
+* `nginx` or `apache2` installed
+
+###  Deployment:
+
+
+sudo apt update
+sudo apt install nginx
+scp -r * user@server_ip:/var/www/html/
+
+
+---
+
+##  2. React App (Frontend SPA)
+
+###  Prerequisites:
+
+* Node.js and React installed (`npm install`)
+* `npm run build` command must generate a `build/` folder
+* Server with `nginx`
+
+###  Deployment:
+
+
+# Build
+npm run build
+
+# Copy to server
+scp -r build/* user@server_ip:/var/www/html/
+
+# Ensure Nginx serves from /var/www/html
+
+
+---
+
+##  3. Node.js App (Backend API)
+
+###  Prerequisites:
+
+* Node.js app with `package.json`
+* Server with:
+
+  * Node.js
+  * PM2 (optional)
+* Port opened (e.g., 3000)
+
+###  Deployment:
+
+
+sudo apt install nodejs npm
+scp -r nodeapp/ user@server_ip:/home/user/
+cd nodeapp && npm install
+node server.js  # or pm2 start server.js
+
+
+---
+
+##  4. Spring Boot App (Java Backend)
+
+###  Prerequisites:
+
+* JDK 17 or higher
+* Built `.jar` file from `mvn clean package`
+* Port opened (e.g., 8080)
+
+###  Deployment:
+
+
+sudo apt install openjdk-17-jdk
+scp target/app.jar user@server_ip:/home/user/
+java -jar app.jar
+
+
+---
+
+##  5. PHP App (Laravel or WordPress)
+
+###  Prerequisites:
+
+* PHP, Apache, and MySQL (`LAMP Stack`)
+* Uploaded app files (WordPress, Laravel)
+* Database credentials configured
+
+###  Deployment:
+
+
+sudo apt install apache2 php libapache2-mod-php mysql-server php-mysql
+scp -r your_php_project/ user@server_ip:/var/www/html/
+
+
+---
+
+##  6. Python App (Flask or Django)
+
+###  Prerequisites:
+
+* Python3, pip, virtualenv
+* `requirements.txt` file ready
+* `gunicorn` and `nginx` for production
+
+###  Deployment:
+
+
+sudo apt install python3 python3-venv nginx
+scp -r flaskapp/ user@server_ip:/home/user/
+cd flaskapp
+python3 -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+gunicorn app:app
+
+
+---
+
+##  7. MERN Stack (Mongo, Express, React, Node)
+
+###  Prerequisites:
+
+* MongoDB (local or Atlas)
+* Backend Node.js API
+* React frontend
+* Server with Node.js, Nginx
+
+###  Deployment:
+
+
+# Backend
+scp -r backend/ user@server_ip:/home/user/
+cd backend && npm install && pm2 start server.js
+
+# Frontend
+npm run build
+scp -r build/ user@server_ip:/var/www/html/
+
+# Nginx reverse proxy to Node API
+
+
+---
+
+##  8. Docker Deployment (Any App)
+
+###  Prerequisites:
+
+* Dockerfile written
+* Docker installed on server
+* Internet or Docker Hub access
+
+###  Deployment:
+
+
+# Build image locally
+docker build -t myapp .
+
+# Or pull from Docker Hub
+docker pull username/myapp
+
+# Run container
+docker run -d -p 80:8080 username/myapp
+
+
+---
+
+##  9. Kubernetes Deployment
+
+###  Prerequisites:
+
+* Docker image available in registry
+* Kubernetes cluster (minikube, GKE, EKS, etc.)
+* kubectl configured
+
+###  Deployment:
+
+
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+
+
+---
+
+##  General Server Prerequisites (All Apps)
+
+| Tool          | Purpose                    | Install Command                                               |      |
+| ------------- | -------------------------- | ------------------------------------------------------------- | ---- |
+| OpenSSH       | Remote access              | `sudo apt install openssh-server`                             |      |
+| Nginx         | Web server / reverse proxy | `sudo apt install nginx`                                      |      |
+| Java (JDK 17) | For Spring Boot            | `sudo apt install openjdk-17-jdk`                             |      |
+| Node.js       | For Node.js or React       | `sudo apt install nodejs npm`                                 |      |
+| Docker        | For container deployment   | \`curl -fsSL [https://get.docker.com](https://get.docker.com) | sh\` |
+| PM2           | Node.js process manager    | `npm install -g pm2`                                          |      |
+| Python 3      | For Flask or Django        | `sudo apt install python3 python3-venv`                       |      |
+| Apache2       | For PHP/Laravel/WordPress  | `sudo apt install apache2`                                    |      |
+
+---
+
+Let me know which application you'd like a **complete working example** for, and I’ll generate the full source code + deployment script for that.
